@@ -1,0 +1,3 @@
+module EnsuredSchema
+  # Your code goes here...
+end
