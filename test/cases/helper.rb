@@ -14,6 +14,8 @@ require 'connection'
 
 require 'cases/repair_helper'
 
+require 'ensured_schema'
+
 # Show backtraces for deprecated behavior for quicker cleanup.
 ActiveSupport::Deprecation.debug = true
 
