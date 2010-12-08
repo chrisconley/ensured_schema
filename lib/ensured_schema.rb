@@ -1,12 +1,31 @@
+require 'ensured_schema/column'
 module ActiveRecord
   module ConnectionAdapters
-    class AbstractAdapter
-      def table_exists?(table_name)
-        tables.map(&:downcase).include?(table_name.to_s.downcase)
-      end
-    end
-
     module SchemaStatements
+      # Checks to see if an index exists on a table for a given index definition
+      #
+      # === Examples
+      #  # Check an index exists
+      #  index_exists?(:suppliers, :company_id)
+      #
+      #  # Check an index on multiple columns exists
+      #  index_exists?(:suppliers, [:company_id, :company_type])
+      #
+      #  # Check a unique index exists
+      #  index_exists?(:suppliers, :company_id, :unique => true)
+      #
+      #  # Check an index with a custom name exists
+      #  index_exists?(:suppliers, :company_id, :name => "idx_company_id"
+      def new_index_exists?(table_name, column_name, options = {}) # Don't overwrite existing index_exists?
+        column_names = Array.wrap(column_name)
+        index_name = options.key?(:name) ? options[:name].to_s : index_name(table_name, :column => column_names)
+        if options[:unique]
+          indexes(table_name).any?{ |i| i.unique && i.name == index_name }
+        else
+          indexes(table_name).any?{ |i| i.name == index_name }
+        end
+      end
+
       # Checks to see if a column exists in a given table.
       #
       # === Examples
@@ -26,15 +45,25 @@ module ActiveRecord
                                       (!options[:precision]  || c.precision == options[:precision]) &&
                                       (!options[:scale]      || c.scale == options[:scale]) }
       end
-    end
-  end
-end
 
-module ActiveRecord
-  module ConnectionAdapters
-    class Column
-      def limit_exists?(new_limit)
-        self.limit == new_limit
+      def table(table_name, options = {}, &block)
+        if table_exists?(table_name)
+          puts "table already exists"
+          ensure_table(table_name, &block) # what to do about changing table options
+        else
+          puts "creating table"
+          create_table(table_name, options, &block)
+        end
+      end
+
+      def ensure_table(table_name)
+        yield EnsuredTable.new(table_name, self)
+      end
+
+      def ensure_index(table_name, column_name, options = {})
+        unless new_index_exists?(table_name, column_name, options)
+          add_index(table_name, column_name, options)
+        end
       end
     end
   end
@@ -86,7 +115,6 @@ module ActiveRecord
           #debugger
           if column_exists?(name)
             unless column_exists?(name, column_type, def_options)
-              debugger
               change(name, column_def.sql_type, options)
               puts "#{name} has been changed!"
             end
@@ -118,38 +146,6 @@ module ActiveRecord
   class Schema
     def self.ensure(options={}, &block)
       self.define(options, &block)
-    end
-  end
-end
-
-module ActiveRecord
-  module ConnectionAdapters # :nodoc:
-    module SchemaStatements
-      def table(table_name, options = {}, &block)
-        if table_exists?(table_name)
-          puts "table already exists"
-          ensure_table(table_name, &block) # what to do about changing table options
-        else
-          puts "creating table"
-          create_table(table_name, options, &block)
-        end
-      end
-
-      def ensure_table(table_name)
-        yield EnsuredTable.new(table_name, self)
-      end
-
-      def ensure_index(table_name, column_name, options = {})
-        begin
-          add_index(table_name, column_name, options)
-        rescue => e
-          if e.message =~ /Duplicate key/
-            puts "index already exists"
-          else
-            raise e
-          end
-        end
-      end
     end
   end
 end
