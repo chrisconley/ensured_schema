@@ -12,6 +12,10 @@ Gem::Specification.new do |s|
   s.summary     = %q{Ensures database schema always matches your schema.rb file}
   s.description = %q{Smarter migrations}
 
+  s.add_dependency('activerecord', '~> 2.3.5')
+
+  s.add_development_dependency('mocha', '~> 0.9.8')
+
   s.rubyforge_project = "ensured_schema"
 
   s.files         = `git ls-files`.split("\n")

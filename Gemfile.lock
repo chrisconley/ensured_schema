@@ -1,0 +1,23 @@
+PATH
+  remote: .
+  specs:
+    ensured_schema (0.0.1)
+      activerecord (~> 2.3.5)
+
+GEM
+  remote: http://rubygems.org/
+  specs:
+    activerecord (2.3.10)
+      activesupport (= 2.3.10)
+    activesupport (2.3.10)
+    mocha (0.9.10)
+      rake
+    rake (0.8.7)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  activerecord (~> 2.3.5)
+  ensured_schema!
+  mocha (~> 0.9.8)
