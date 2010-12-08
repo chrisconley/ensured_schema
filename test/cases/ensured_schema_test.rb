@@ -3,6 +3,16 @@ require "cases/helper"
 require 'models/person'
 
 if ActiveRecord::Base.connection.supports_migrations?
+  class ActiveRecord::Migration
+    class <<self
+      attr_accessor :message_count
+      def puts(text="")
+        self.message_count ||= 0
+        self.message_count += 1
+      end
+    end
+  end
+
   class EnsuredSchemaTest < ActiveRecord::TestCase
     def setup
       @conn = ActiveRecord::Base.connection
