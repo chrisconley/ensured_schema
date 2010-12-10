@@ -22,16 +22,12 @@ if ActiveRecord::Base.connection.supports_migrations?
 
     def test_table_definition
       assert_nothing_raised do
-        ActiveRecord::Schema.ensure(:version => '1') do
-          table(:testings, :id => false, :force => true) do |t|
-            t.string :test,  :limit => 30, :default => "", :null => false
-          end
+        @conn.table(:testings, :id => false, :force => true) do |t|
+          t.string :test,  :limit => 30, :default => "", :null => false
         end
 
-        ActiveRecord::Schema.ensure(:version => '1') do
-          table(:testings, :id => false, :force => true) do |t|
-            t.string :test,  :limit => 30, :default => "", :null => false
-          end
+        @conn.table(:testings, :id => false, :force => true) do |t|
+          t.string :test,  :limit => 30, :default => "", :null => false
         end
       end
       assert @conn.table_exists?("testings")
@@ -39,16 +35,14 @@ if ActiveRecord::Base.connection.supports_migrations?
 
     def test_column_definition_does_not_raise
       assert_nothing_raised do
-        ActiveRecord::Schema.ensure(:version => '1') do
-          table(:testings, :id => false, :force => true) do |t|
-            t.string :test,  :limit => 30, :default => "", :null => false
-            t.column :test2, :string
-          end
-          table(:testings, :id => false, :force => true) do |t|
-            t.expects(:change).never
-            t.string :test,  :limit => 30, :default => "", :null => false
-            t.column :test2, :string
-          end
+        @conn.table(:testings, :id => false, :force => true) do |t|
+          t.string :test,  :limit => 30, :default => "", :null => false
+          t.column :test2, :string
+        end
+        @conn.table(:testings, :id => false, :force => true) do |t|
+          t.expects(:change).never
+          t.string :test,  :limit => 30, :default => "", :null => false
+          t.column :test2, :string
         end
       end
     end
@@ -171,13 +165,11 @@ if ActiveRecord::Base.connection.supports_migrations?
     end
 
     def test_column_gets_changed
-      ActiveRecord::Schema.ensure(:version => '1') do
-        table(:testings, :id => false, :force => true) do |t|
-          t.string :test,  :limit => 30, :default => "", :null => false
-        end
-        table(:testings, :id => false, :force => true) do |t|
-          t.string :test,  :limit => 20, :default => "", :null => false
-        end
+      @conn.table(:testings, :id => false, :force => true) do |t|
+        t.string :test,  :limit => 30, :default => "", :null => false
+      end
+      @conn.table(:testings, :id => false, :force => true) do |t|
+        t.string :test,  :limit => 20, :default => "", :null => false
       end
 
       assert !@conn.column_exists?(:testings, :test, :string, :limit => 30)
@@ -187,19 +179,15 @@ if ActiveRecord::Base.connection.supports_migrations?
 
     def test_column_is_removed_once
       assert_nothing_raised do
-        ActiveRecord::Schema.ensure(:version => '1') do
-          table(:testings, :id => false, :force => true) do |t|
-            t.string :test,  :limit => 30, :default => "", :null => false
-            t.string :test2
-            t.remove(:test)
-            t.remove(:test)
-          end
+        @conn.table(:testings, :id => false, :force => true) do |t|
+          t.string :test,  :limit => 30, :default => "", :null => false
+          t.string :test2
+          t.remove(:test)
+          t.remove(:test)
         end
 
-        ActiveRecord::Schema.ensure(:version => '1') do
-          table(:testings, :id => false, :force => true) do |t|
-            t.remove(:test)
-          end
+        @conn.table(:testings, :id => false, :force => true) do |t|
+          t.remove(:test)
         end
       end
       assert !@conn.column_exists?(:testings, :test)
@@ -207,13 +195,11 @@ if ActiveRecord::Base.connection.supports_migrations?
 
     def test_ensure_index
       assert_nothing_raised do
-        ActiveRecord::Schema.ensure(:version => '1') do
-          table(:testings, :id => false, :force => true) do |t|
-            t.string :test,  :limit => 30, :default => "", :null => false
-          end
-          ensure_index :testings, [:test], :name => "test_index", :unique => true
-          ensure_index :testings, [:test], :name => "test_index", :unique => true
+        @conn.table(:testings, :id => false, :force => true) do |t|
+          t.string :test,  :limit => 30, :default => "", :null => false
         end
+        @conn.ensure_index :testings, [:test], :name => "test_index", :unique => true
+        @conn.ensure_index :testings, [:test], :name => "test_index", :unique => true
       end
       assert @conn.new_index_exists?(:testings, :test, :name => "test_index")
     end
