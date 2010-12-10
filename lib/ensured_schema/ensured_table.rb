@@ -12,6 +12,10 @@ module ActiveRecord
         end
       end
 
+      def remove(column_name)
+        super if column_exists?(column_name)
+      end
+
       %w( string text integer float decimal datetime timestamp time date binary boolean ).each do |column_type|
         class_eval <<-EOV
           def #{column_type}(*args)                   # def string(*args)

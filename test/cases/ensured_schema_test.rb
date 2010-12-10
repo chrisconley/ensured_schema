@@ -185,6 +185,26 @@ if ActiveRecord::Base.connection.supports_migrations?
       assert @conn.column_exists?(:testings, :test)
     end
 
+    def test_column_is_removed_once
+      assert_nothing_raised do
+        ActiveRecord::Schema.ensure(:version => '1') do
+          table(:testings, :id => false, :force => true) do |t|
+            t.string :test,  :limit => 30, :default => "", :null => false
+            t.string :test2
+            t.remove(:test)
+            t.remove(:test)
+          end
+        end
+
+        ActiveRecord::Schema.ensure(:version => '1') do
+          table(:testings, :id => false, :force => true) do |t|
+            t.remove(:test)
+          end
+        end
+      end
+      assert !@conn.column_exists?(:testings, :test)
+    end
+
     def test_ensure_index
       assert_nothing_raised do
         ActiveRecord::Schema.ensure(:version => '1') do
