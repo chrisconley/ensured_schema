@@ -2,11 +2,6 @@ module ActiveRecord
   module ConnectionAdapters
     class EnsuredTable < Table
 
-      def column_exists?(column_name, type = nil, options = {})
-        #debugger
-        @base.column_exists?(@table_name, column_name, type, options)
-      end
-
       %w( string text integer float decimal datetime timestamp time date binary boolean ).each do |column_type|
         class_eval <<-EOV
           def #{column_type}(*args)                   # def string(*args)
