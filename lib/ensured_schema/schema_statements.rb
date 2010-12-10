@@ -47,10 +47,8 @@ module ActiveRecord
 
       def table(table_name, options = {}, &block)
         if table_exists?(table_name)
-          puts "table already exists"
           ensure_table(table_name, &block) # what to do about changing table options
         else
-          puts "creating table"
           create_table(table_name, options, &block)
         end
       end

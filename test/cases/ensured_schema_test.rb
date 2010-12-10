@@ -20,7 +20,7 @@ if ActiveRecord::Base.connection.supports_migrations?
       @conn.drop_table("testings") if @conn.table_exists?("testings")
     end
 
-    def testings_definition
+    def test_table_definition
       assert_nothing_raised do
         ActiveRecord::Schema.ensure(:version => '1') do
           table(:testings, :id => false, :force => true) do |t|
@@ -42,10 +42,12 @@ if ActiveRecord::Base.connection.supports_migrations?
         ActiveRecord::Schema.ensure(:version => '1') do
           table(:testings, :id => false, :force => true) do |t|
             t.string :test,  :limit => 30, :default => "", :null => false
+            t.column :test2, :string
           end
           table(:testings, :id => false, :force => true) do |t|
             t.expects(:change).never
             t.string :test,  :limit => 30, :default => "", :null => false
+            t.column :test2, :string
           end
         end
       end
