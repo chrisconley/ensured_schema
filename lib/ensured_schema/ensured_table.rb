@@ -31,7 +31,6 @@ module ActiveRecord
         column_names.each do |name|
           column_def = build_column_definition(name, column_type, options)
           def_options = column_def.members.inject({}){|h, k| h[k.to_sym] = column_def[k]; h;}
-          #debugger
           column(name, column_type.to_sym, def_options)
         end
       end
